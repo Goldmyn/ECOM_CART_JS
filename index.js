@@ -138,6 +138,19 @@ function subTotal(index) {
   T_PRICE[index].textContent = total;
 }
 
+// Adding independent color states for each LOVE_BTN
+let colorState = Array(LOVE_BTN.length).fill(false); // Array to keep track of each button's state
+
+function updateLove(index) {
+  if (!colorState[index]) {
+    LOVE_BTN[index].style.fill = "red"; // Toggle to red when clicked
+    colorState[index] = true; // Set the state for this button
+  } else {
+    LOVE_BTN[index].style.fill = ""; // Reset color to default
+    colorState[index] = false; // Reset the state for this button
+  }
+}
+
 function updateAllTotal() {
   let allTotal = 0;
   const updatedTPrice = document.querySelectorAll(".t_price"); // Re-query T_PRICE
@@ -156,4 +169,4 @@ function deleteItem(index) {
 }
 
 // Initialize the total display
-updateAllTotal(); 
+updateAllTotal();
