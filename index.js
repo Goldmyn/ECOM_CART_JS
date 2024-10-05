@@ -80,108 +80,80 @@ function updateLove() {
 
 */
 
-const DISPLAY_NUM = document.querySelectorAll(".display_num"); // Selecting all elements with the class 'display_num'
-const ADD_BTN = document.querySelectorAll(".increase_btn"); // Selecting all elements with the class 'increase_btn'
-const SUBTRACT_BTN = document.querySelectorAll(".decrease_btn"); // Selecting all elements with the class 'decrease_btn'
-const LOVE_BTN = document.querySelectorAll(".love_btn"); // Selecting all elements with the id 'love_btn'
-const PRICE = document.querySelectorAll(".price"); // Selecting all elements with the class 'price'
-const T_PRICE = document.querySelectorAll(".t_price"); // Selecting all elements with the class 't_price'
-const ALL_TOTAL = document.getElementById("allTotal"); //Selecting the element with the id 'allTotal'
+const DISPLAY_NUM = document.querySelectorAll(".display_num");
+const ADD_BTN = document.querySelectorAll(".increase_btn");
+const SUBTRACT_BTN = document.querySelectorAll(".decrease_btn");
+const LOVE_BTN = document.querySelectorAll(".love_btn");
+const PRICE = document.querySelectorAll(".price");
+const T_PRICE = document.querySelectorAll(".t_price");
+const ALL_TOTAL = document.getElementById("allTotal");
+const DELETE_BTN = document.querySelectorAll(".lucide-trash-2");
 
-// Adding event listeners for each add and subtract button (assuming you have multiple buttons)
+// Adding event listeners
 ADD_BTN.forEach((btn, index) => {
-  btn.addEventListener("click", () => addFunction(index)); // Passing the index to identify which element to update
+  btn.addEventListener("click", () => addFunction(index));
 });
 
 SUBTRACT_BTN.forEach((btn, index) => {
-  btn.addEventListener("click", () => subFunction(index)); // Same for subtract button
+  btn.addEventListener("click", () => subFunction(index));
 });
 
 LOVE_BTN.forEach((btn, index) => {
   btn.addEventListener("click", () => updateLove(index));
 });
 
+DELETE_BTN.forEach((btn, index) => {
+  btn.addEventListener("click", () => deleteItem(index));
+});
+
+// Functions
 function addFunction(index) {
   const cartValue = DISPLAY_NUM[index].textContent;
-  const cartNumber = parseInt(cartValue, 10);
-  let num = cartNumber;
-
-  num++; // Increase the number
-
-  DISPLAY_NUM[index].textContent = num; // Update the display
-  totalPrice(index); // Update total price
+  let num = parseInt(cartValue, 10) + 1;
+  DISPLAY_NUM[index].textContent = num;
+  totalPrice(index);
+  updateAllTotal(); // Update all total after adding
 }
 
 function subFunction(index) {
-  const SUBNUM = DISPLAY_NUM[index].textContent;
-  let SUB = parseInt(SUBNUM, 10);
-
-  SUB--; // Decrease the number
-  if (SUB < 1) {
-    SUB = 1; // Ensure it doesn't go below 1
-  }
-
-  DISPLAY_NUM[index].textContent = SUB; // Update the display
-  subTotal(index); // Update the total price
+  let SUB = parseInt(DISPLAY_NUM[index].textContent, 10);
+  SUB = Math.max(1, SUB - 1); // Ensure it doesn't go below 1
+  DISPLAY_NUM[index].textContent = SUB;
+  subTotal(index);
+  updateAllTotal(); // Update all total after subtracting
 }
-
-function totalPrice(index) {
-  let total =
-    parseInt(T_PRICE[index].textContent) + parseInt(PRICE[index].textContent); // Add price to total
-
-  T_PRICE[index].textContent = total; // Update total price display
-}
-
-function subTotal(index) {
-  let total =
-    parseInt(T_PRICE[index].textContent) - parseInt(PRICE[index].textContent); // Subtract price from total
-  if (total <= parseInt(PRICE[index].textContent)) {
-    total = parseInt(PRICE[index].textContent); // Ensure total doesn't drop below the price of one item
-  }
-  T_PRICE[index].textContent = total; // Update total price display
-}
-
-// Adding independent color states for each LOVE_BTN
-let colorState = Array(LOVE_BTN.length).fill(false); // Array to keep track of each button's state
-
-function updateLove(index) {
-  if (!colorState[index]) {
-    LOVE_BTN[index].style.fill = "red"; // Toggle to red when clicked
-    colorState[index] = true; // Set the state for this button
-  } else {
-    LOVE_BTN[index].style.fill = ""; // Reset color to default
-    colorState[index] = false; // Reset the state for this button
-  }
-}
-
-function updateAllTotal() {
-  let allTotal = 0;
-
-  // Loop through all T_PRICE elements and sum their values
-  T_PRICE.forEach((price) => {
-    allTotal += parseInt(price.textContent, 10); // Convert textContent to a number and add to total
-  });
-
-  ALL_TOTAL.textContent = allTotal; // Update the allTotal element
-}
-updateAllTotal();
 
 function totalPrice(index) {
   let total =
     parseInt(T_PRICE[index].textContent, 10) +
-    parseInt(PRICE[index].textContent, 10); // Add price to total
-
-  T_PRICE[index].textContent = total; // Update total price display
-  updateAllTotal(); // Update the overall total for all items
+    parseInt(PRICE[index].textContent, 10);
+  T_PRICE[index].textContent = total;
 }
 
 function subTotal(index) {
   let total =
     parseInt(T_PRICE[index].textContent, 10) -
-    parseInt(PRICE[index].textContent, 10); // Subtract price from total
-  if (total <= parseInt(PRICE[index].textContent, 10)) {
-    total = parseInt(PRICE[index].textContent, 10); // Ensure total doesn't drop below the price of one item
-  }
-  T_PRICE[index].textContent = total; // Update total price display
-  updateAllTotal(); // Update the overall total for all items
+    parseInt(PRICE[index].textContent, 10);
+  total = Math.max(parseInt(PRICE[index].textContent, 10), total); // Ensure it doesn't go below the price of one item
+  T_PRICE[index].textContent = total;
 }
+
+function updateAllTotal() {
+  let allTotal = 0;
+  const updatedTPrice = document.querySelectorAll(".t_price"); // Re-query T_PRICE
+  updatedTPrice.forEach((price) => {
+    allTotal += parseInt(price.textContent, 10);
+  });
+  ALL_TOTAL.textContent = allTotal;
+}
+
+function deleteItem(index) {
+  const sectionToDelete = DISPLAY_NUM[index].closest(".delete");
+  if (sectionToDelete) {
+    sectionToDelete.remove();
+    updateAllTotal(); // Update the overall total after deletion
+  }
+}
+
+// Initialize the total display
+updateAllTotal(); 
